@@ -4,6 +4,15 @@
 <h1 class="title">
   Welcome, {{ name }}!
 </h1>
+<div>
+	{% with messages = get_flashed_messages() %}
+        {% if messages %}
+    <div class="notification is-success">
+        {{ messages[0] }} See your scores on your <a href="{{ url_for('main.profile') }}">profile</a>.
+    </div>
+        {% endif %}
+        {% endwith %}
+	</div>
 <h1 id="scores">
 	Number of Guesses Remaining: 10
 </h1>
@@ -13,76 +22,22 @@
                     <input id="guess_text" class="input is-large" type="text" name="guess" placeholder="Your Guess" autofocus="">
                 </div>
             </div>
+            {% if status == "In Progress" %}
             <button class="button is-block is-info is-large is-fullwidth">Submit Guess</button>
+            {% endif %}
+
+            {% if status != "In Progress" %}
+            <button class="button is-block is-info is-large is-fullwidth" disabled>Game Over</button>
+            {% endif %}
         </form>
  
  <div id="feedback">
  	<p>Attempts: {{ attempt }}</p> 
  </div>
- <table>
-  <tr>
-    <td>Attempt 1: </td>
-    <td> {{ feedback_1 }}</td>
-  </tr>
+ <ul>
+        {% for n in attempts %}
+        <li>Attempt {{n.attempt}}: Guess: {{n.guess}} Feedback:{{n.feedback}}</li>
+        {% endfor %}
+</ul>
 
-  <tr>
-    <td>Attempt 2: </td>
-    <td> {{ feedback_2 }}</td>
-  </tr>
-
-  <tr>
-    <td>Attempt 3: </td>
-    <td> {{ feedback_3 }}</td>
-  </tr>
-
-  <tr>
-    <td>Attempt 4: </td>
-    <td> {{ feedback_4 }}</td>
-  </tr>
-
-  <tr>
-    <td>Attempt 5: </td>
-    <td> {{ feedback_5 }}</td>
-  </tr>
-
-  <tr>
-    <td>Attempt 6: </td>
-    <td> {{ feedback_6 }}</td>
-  </tr>
-
-  <tr>
-    <td>Attempt 7: </td>
-    <td> {{ feedback_7 }}</td>
-  </tr>
-
-  <tr>
-    <td>Attempt 8: </td>
-    <td> {{ feedback_8 }}</td>
-  </tr>
-
-  <tr>
-    <td>Attempt 9: </td>
-    <td> {{ feedback_9 }}</td>
-  </tr>
-
-  <tr>
-    <td>Attempt 10: </td>
-    <td> {{ feedback_10 }}</td>
-  </tr>
-
-</table>
-{% endblock %}
-
-{% block javascript %}
-<script>
-	function checkGuess() {
-		if (document.getElementById("guess_text").value == "1234") {
-			document.getElementById("scores").innerHTML = "You got it!";
-			alert("wtf");
-		}
-		else {
-			alert("screw you");
-		}
-	}
-</script>
 {% endblock %}

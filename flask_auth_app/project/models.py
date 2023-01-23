@@ -22,8 +22,9 @@ class CurrentGame(db.Model):
 	status = db.Column(db.String(100))
 	attempt = db.Column(db.Integer)
 
-class CurrentGameFeedback(db.Model):
+class GameAttempt(db.Model):
 	id = db.Column(db.Integer, primary_key=True)# primary keys are required by SQLAlchemy
 	parent_game_id = db.Column(db.String(100))
 	attempt = db.Column(db.Integer)
+	guess = db.Column(db.String(100))
 	feedback = db.Column(db.String(100))

@@ -1,7 +1,7 @@
 import requests
-from flask import Blueprint, render_template, request, redirect, url_for
+from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required, current_user
-from .models import CurrentGame
+from .models import CurrentGame, GameAttempt
 from . import db
 
 main = Blueprint('main', __name__)
@@ -28,7 +28,7 @@ def game():
 	# Define the needed attributes of the CurrentGame
 	correct_answer = str(data).replace("\n", "")
 	user_email = current_user.email
-	status = "not won"
+	status = "In Progress"
 	attempt = 0
 	new_game = CurrentGame(correct_answer=correct_answer, user_email = user_email, status=status, attempt=attempt)
 
@@ -42,7 +42,7 @@ def game():
 	print(current_game_id)
 	db.session.commit()
 
-	return render_template('game.html', name=current_user.name)
+	return render_template('game.html', name=current_user.name, status=new_game.status)
 
 @main.route('/game', methods=['POST'])
 def game_post():
@@ -55,6 +55,8 @@ def game_post():
     current_game.attempt += 1
     db.session.commit()
 
+
+    # Game Scoring Logic
     correct_answer = current_game.correct_answer
     attempt = current_game.attempt
 
@@ -76,40 +78,21 @@ def game_post():
     	feedback = str(num) + " correct number and " + str(pos) + " correct positions"
 
     print(feedback)
+    print(current_game.id)
 
-    if attempt == 1:
-    	return render_template('game.html', name=current_user.name, attempt= str(current_game.attempt), feedback_1 = feedback)
+    # Save The Attempt + Feedback
+    game_attempt = GameAttempt(parent_game_id=current_game.id, attempt=current_game.attempt, guess=guess, feedback=feedback)
+    db.session.add(game_attempt)
+    db.session.commit()
 
-    elif attempt == 2:
-    	return render_template('game.html', name=current_user.name, attempt= str(current_game.attempt), feedback_2 = feedback)
+    attempts = GameAttempt.query.filter_by(parent_game_id = current_user.current_game)
 
-    elif attempt == 3:
-    	return render_template('game.html', name=current_user.name, attempt= str(current_game.attempt), feedback_3 = feedback)
+    if guess == correct_answer:
+    	flash('Game Success! You win!')
+    	current_game.status = "Won"
+    	db.session.commit()
 
-    elif attempt == 4:
-    	return render_template('game.html', name=current_user.name, attempt= str(current_game.attempt), feedback_4 = feedback)
+    return render_template('game.html', name=current_user.name, attempts=attempts, status=current_game.status)
 
-    elif attempt == 5:
-    	return render_template('game.html', name=current_user.name, attempt= str(current_game.attempt), feedback_5 = feedback)
-
-    elif attempt == 6:
-    	return render_template('game.html', name=current_user.name, attempt= str(current_game.attempt), feedback_6 = feedback)
-
-    elif attempt == 7:
-    	return render_template('game.html', name=current_user.name, attempt= str(current_game.attempt), feedback_7 = feedback)
-
-    elif attempt == 8:
-    	return render_template('game.html', name=current_user.name, attempt= str(current_game.attempt), feedback_8 = feedback)
-
-    elif attempt == 9:
-    	return render_template('game.html', name=current_user.name, attempt= str(current_game.attempt), feedback_9 = feedback)
-
-    else:
-    	return render_template('game.html', name=current_user.name, attempt= str(current_game.attempt), feedback_10 = feedback)
-
-
-    
-    if guess == "1234":
-        return render_template('game.html', name=current_user.name, attempt= str(current_game.attempt), feedback = feedback)
     
     return redirect(url_for('main.game'))
