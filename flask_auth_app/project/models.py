@@ -19,3 +19,9 @@ class CurrentGame(db.Model):
 	correct_answer = db.Column(db.String(100))
 	status = db.Column(db.String(100))
 	attempt = db.Column(db.Integer)
+
+class CurrentGameFeedback(db.Model):
+	id = db.Column(db.Integer, primary_key=True)# primary keys are required by SQLAlchemy
+	parent_game_id = db.Column(db.String(100))
+	attempt = db.Column(db.Integer)
+	feedback = db.Column(db.String(100))
