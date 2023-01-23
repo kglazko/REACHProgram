@@ -1,3 +1,4 @@
+import requests
 from flask import Blueprint, render_template, request, redirect, url_for
 from flask_login import login_required, current_user
 from .models import CurrentGame
@@ -17,13 +18,30 @@ def profile():
 @main.route('/game')
 @login_required
 def game():
-	correct_answer = "1234"
+	# Send a request to the random int API
+	url = "https://www.random.org/integers/?num=4&min=0&max=7&col=1&base=10&format=plain&rnd=new"
+	
+	# Receive the response and parse it into something usable
+	data = requests.get(url, timeout=2.50).text
+	print(str(data).replace("\n", ""))
+
+	# Define the needed attributes of the CurrentGame
+	correct_answer = str(data).replace("\n", "")
+	user_email = current_user.email
 	status = "not won"
 	attempt = 0
-	new_game = CurrentGame(correct_answer=correct_answer, status=status, attempt=attempt)
+	new_game = CurrentGame(correct_answer=correct_answer, user_email = user_email, status=status, attempt=attempt)
 
+	# Add the CurrentGame to the DB
 	db.session.add(new_game)
 	db.session.commit()
+
+	# Add the current game to the current user
+	current_game_id = CurrentGame.query.filter_by(user_email = current_user.email, correct_answer = correct_answer).first().id
+	current_user.current_game = current_game_id
+	print(current_game_id)
+	db.session.commit()
+
 	return render_template('game.html', name=current_user.name)
 
 @main.route('/game', methods=['POST'])
@@ -31,7 +49,7 @@ def game_post():
     guess = request.form.get('guess')
     user_email = current_user.email
 
-    current_game = CurrentGame.query.filter_by(correct_answer = "1234").first()
+    current_game = CurrentGame.query.filter_by(id = current_user.current_game).first()
     
     #Increment number of attempts
     current_game.attempt += 1
