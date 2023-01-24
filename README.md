@@ -174,6 +174,11 @@ return render_template('game.html', name=current_user.name, attempts=attempts, s
 * I have some cool game-end logic, powered by `flash` in `flask`. I am able to display messages in game-over instances. It adds a nice, UI touch. I am also reveal the correct answer to folks at the end, again, powered by templating and the DB.
 * DigitalOcean deployment, although only time will tell if it worked.
 
-## To-Dos
+### To-Dos
 * It would be nice to have some form of limiting how many numbers a user can type based on the difficulty level, and limiting them to only inputting characters between 0-7 (you can do all of them now).
 * Ability to sort results on the profile page.
+
+## My Reflections
+* I am kind of amazed by the fact I was actually able to take the theory from my CS DB class and make optimized database tables in real life (I know, with some redundancy for convenience), and integrate them into my app to make it so much less hard-coded than I usually would. I have never done this before on my own.
+* I am very proud of all of the code that I wrote in `main.py`. It is very far outside of my normal coding domain. 
+* Deploying to DigitalOcean was difficult and confusing, but if I get a live-running game out of it, it will be worth it.
