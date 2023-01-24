@@ -95,7 +95,7 @@ correct_answer = str(data).replace("\n", "")
 ```
 * `num_diff` is determined by the difficult level, and a simple if-based function determines that.
 * The user then types guesses into the form seen in the `game.html` template. Every time they submit a guess, the response is checked against the correct answer. Attempt numbers are incremented, and when a user reaches the attempt limit, the game will end and they will be prompted to try again or see their results on their profile through a `flash`. Likewise, if the user succeeds, they will be congratulated and offered the same options (once again, this takes place in `main.py`.
-* The game logic to determine whether a number or position is correct is the following:
+* The game logic to determine whether a number or position is correct is below. I found this game logic difficult to figure out and had to resort to duplicating and converting the guess string to a set to make it easy to iterate in the case of duplicates. The duplicates were really messing with the logic for finding the correct numbers. I tested this repeatedly, but this part could benefit from more testing, always. 
 ```
 def calculate_correct_numbers(guess, answer):
 	num = 0
