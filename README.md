@@ -119,3 +119,61 @@ def calculate_correct_position(guess,answer):
 			pos +=1
 	return pos
 ```
+### Flask-Driven UI Updates
+* During both selecting a game mode and game play, when a player submits a combination, it results in a `POST` which is then addressed through the appropriate method, all of which are in `main.py`.
+* The code in the template `game_menu.html` shows the following in the form where the POST happens:
+```
+<form form method="POST" action="/game_menu">
+  <div class="field">
+                <div class="control">
+            <h2 id="scores">
+  Select a Mode
+</h2>
+            <div class="select is-primary">
+              <select name="difficulty">
+              <option>Zen</option>
+              <option>Easy</option>
+              <option>Medium</option>
+              <option>Hard</option>
+              </select>
+            </div>
+
+            <button class="button is-success">Start Game</button>
+          </div>
+        </div>
+        </form>
+```
+* Meanwhile, in `main.py`, this is what happens when a POST happens, relating to `game_menu`:
+```
+@main.route('/game_menu', methods=['POST'])
+def game_menu_post():
+	difficulty = request.form.get('difficulty')
+	print(difficulty)
+
+	user_email = current_user.email
+
+	user = UserPrefs.query.filter_by(user_email=user_email).first() # if this returns a user, then the email already exists in database
+	if user:
+		user.difficulty = difficulty
+		db.session.commit()
+	else:
+		user = UserPrefs(user_email=user_email, difficulty=difficulty)
+		db.session.add(user)
+		db.session.commit()
+
+	return redirect(url_for('main.game'))
+```
+* Similarly, `game` has complex interactions that happen when an attempted guess `POST`. Notably, we re-render the `game` template with the updated game state, number of guesses, feedback from previous attempts, and the correct answer (for when the game is over).
+```
+return render_template('game.html', name=current_user.name, attempts=attempts, status=current_game.status, correct_answer=current_game.correct_answer, max_attempts= current_game.max_attempts, difficulty=difficulty, attempt=current_game.attempt)
+```
+## Features
+### Cool additions and extras!
+* The sign-up, login, and profile page that tracks your scores.
+* We already detailed the difficulty selection, but yes, that is a thing. I was proud of my work putting it as a user pref in a database table, and changing the URL request based on the difficulty. Additionally, I modify the text within the typing box for the guesses based on the difficulty level, prompting users to type 3, 4, or 5 characters depending on the difficulty.
+* I have some cool game-end logic, powered by `flash` in `flask`. I am able to display messages in game-over instances. It adds a nice, UI touch. I am also reveal the correct answer to folks at the end, again, powered by templating and the DB.
+* DigitalOcean deployment, although only time will tell if it worked.
+
+## To-Dos
+* It would be nice to have some form of limiting how many numbers a user can type based on the difficulty level, and limiting them to only inputting characters between 0-7 (you can do all of them now).
+* Ability to sort results on the profile page.
