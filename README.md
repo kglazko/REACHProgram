@@ -46,4 +46,40 @@ correctly
  * As of tonight, they are having service issues relating to project URLs: https://status.digitalocean.com/incidents/y02k6rjpz6tm
  * I got my project deployed finally (gunicorn is complicated) and then the URL wouldn't work. Hopefully it will tomorrow, https://whale-app-gmx7a.ondigitalocean.app/
 
+## Development Process
+### Flask app and authentication
+* The Flask login/sign-up was based on the tutorial from https://www.digitalocean.com/community/tutorials/how-to-add-authentication-to-your-app-with-flask-login
+* The `game.html` and `game_menu.html` templates were added- this is where the gameplay happens once a user is logged in. The `profile.html` page now has the important task of containing a user's game scores.
+* The game logic- and the updates to the `game`, `game_menu`, and `profile` templates as the game is played- lives within `main.py`. Login/sign-up related work lives within `auth.py`.
 
+### Databases
+* I tried to minimize hard-coding. As a result, I added to the auth tutorial's `model.py` to create a table for user preferences, a game object, and guess attempts.
+```
+class User(UserMixin, db.Model):
+    id = db.Column(db.Integer, primary_key=True) # primary keys are required by SQLAlchemy
+    email = db.Column(db.String(100), unique=True)
+    password = db.Column(db.String(100))
+    name = db.Column(db.String(1000))
+    current_game = db.Column(db.Integer)
+
+class UserPrefs(db.Model):
+	id = db.Column(db.Integer, primary_key=True) # primary keys are required by SQLAlchemy
+	user_email = db.Column(db.String(100), unique=True)
+	difficulty = db.Column(db.String(100))
+
+class CurrentGame(db.Model):
+	id = db.Column(db.Integer, primary_key=True)# primary keys are required by SQLAlchemy
+	date = db.Column(db.String(100))
+	correct_answer = db.Column(db.String(100))
+	user_email = db.Column(db.String(100))
+	status = db.Column(db.String(100))
+	attempt = db.Column(db.Integer)
+	max_attempts = db.Column(db.Integer)
+
+class GameAttempt(db.Model):
+	id = db.Column(db.Integer, primary_key=True)# primary keys are required by SQLAlchemy
+	parent_game_id = db.Column(db.String(100))
+	attempt = db.Column(db.Integer)
+	guess = db.Column(db.String(100))
+	feedback = db.Column(db.String(100))
+```
