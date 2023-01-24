@@ -34,3 +34,16 @@ correctly
   * _Medium_ gives you a pattern of 4 numbers.
   * _Hard_ gives you a pattern of 5 numbers.
   * _Zen_ gives you a pattern of 5 numbers, and 100 attempts to figure out the puzzle.
+ 
+ ## How to Run
+ ### On your local computer
+ * Clone or download the repository
+ * Install the dependencies in the requirements.txt in your choice of virtual or non-virtual environment.
+ * Run the following commands: `export FLASK_APP=project` and `export FLASK_DEBUG=1`
+ * Once you do this, you can run the application from the flask_app_auth folder using `flask run`
+ 
+ ### On DigitalOcean
+ * As of tonight, they are having service issues relating to project URLs: https://status.digitalocean.com/incidents/y02k6rjpz6tm
+ * I got my project deployed finally (gunicorn is complicated) and then the URL wouldn't work. Hopefully it will tomorrow, https://whale-app-gmx7a.ondigitalocean.app/
+
+
