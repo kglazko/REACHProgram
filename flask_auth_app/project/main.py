@@ -99,7 +99,7 @@ def game_post():
     correct_answer = current_game.correct_answer
     attempt = current_game.attempt
 
-    pos = 0
+    '''pos = 0
     num = 0
     for i in guess:
     	if i in correct_answer:
@@ -107,8 +107,10 @@ def game_post():
     		num +=1
     		if (guess.rfind(i) == correct_answer.rfind(i)):
     			print("In the same position")
-    			pos +=1
+    			pos +=1'''
     
+    num = calculate_correct_numbers(guess, correct_answer)
+    pos = calculate_correct_position(guess, correct_answer)
     feedback = ""
     if pos is 0 and num is 0:
     	feedback = "All incorrect"
@@ -156,3 +158,28 @@ def num_allowed_attempts(level):
 		return 100
 	else:
 		return 10
+
+def calculate_correct_numbers(guess, answer):
+	num = 0
+	guess_set = set(guess)
+
+	for i in guess_set:
+		guess_instances = guess.count(i)
+		answer_instances = answer.count(i)
+		if answer_instances > 0:
+			if guess_instances > answer_instances:
+				num += answer_instances
+
+			else:
+				num += guess_instances
+	return num
+
+def calculate_correct_position(guess,answer):
+	pos = 0
+	for i in range (0, len(guess)):
+		if guess[i] == answer[i]:
+			pos +=1
+	return pos
+
+
+
