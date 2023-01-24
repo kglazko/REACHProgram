@@ -53,7 +53,7 @@ correctly
 * The game logic- and the updates to the `game`, `game_menu`, and `profile` templates as the game is played- lives within `main.py`. Login/sign-up related work lives within `auth.py`.
 
 ### Databases
-* I tried to minimize hard-coding. As a result, I added to the auth tutorial's `model.py` to create a table for user preferences, a game object, and guess attempts.
+* I tried to minimize hard-coding. As a result, I added to the auth tutorial's `model.py` to create a tables for user preferences, a game object, and guess attempts.
 ```
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True) # primary keys are required by SQLAlchemy
@@ -83,3 +83,4 @@ class GameAttempt(db.Model):
 	guess = db.Column(db.String(100))
 	feedback = db.Column(db.String(100))
 ```
+* `UserPrefs` currently tracks the game difficulty a user has selected when starting the game. `CurrentGame`, named a bit poorly perhaps, represents a game that is or was played by a player. It tracks important game features like the correct answer, the number of guesses a user has made, and the max number of attempts (10 except in Zen Mode).`GameAttempt` tracks the guesses themselves a user has made for a specific game, as well as feedback strings that accompany those guesses. The primary purpose of this table was just to display the attempts and feedback to the user in a way that persists despite the template re-rendering with each guess.
