@@ -17,12 +17,26 @@
 <div class="columns">
 <div class="column is-one-half">
 <h1 id="scores">
-	Number of Guesses Remaining: 10
+	Number of Guesses: {{ attempt }} /{{ max_attempts }}
 </h1>
 <form form method="POST" action="/game">
             <div class="field">
                 <div class="control">
-                    <input id="guess_text" class="input is-large" type="text" name="guess" placeholder="Your Guess" autofocus="">
+                	{% if difficulty == "Easy" %}
+                    <input id="guess_text" class="input is-large" type="text" name="guess" placeholder="Enter 3 Numbers" autofocus="">
+                    {% endif %}
+
+                    {% if difficulty == "Zen" %}
+                    <input id="guess_text" class="input is-large" type="text" name="guess" placeholder="Enter 5 Numbers" autofocus="">
+                    {% endif %}
+
+                    {% if difficulty == "Medium" %}
+                    <input id="guess_text" class="input is-large" type="text" name="guess" placeholder="Enter 4 Numbers" autofocus="">
+                    {% endif %}
+
+                    {% if difficulty == "Hard" %}
+                    <input id="guess_text" class="input is-large" type="text" name="guess" placeholder="Enter 5 Numbers" autofocus="">
+                    {% endif %}
                 </div>
             </div>
             {% if status == "In Progress" %}
@@ -54,6 +68,9 @@
       {% endfor %}
     </tbody>
   </table>
+  {% if status != "In Progress" %}
+            <div>Results : {{ correct_answer }}</div>
+            {% endif %}
  </div>
 </div>
 

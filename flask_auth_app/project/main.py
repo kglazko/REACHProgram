@@ -46,7 +46,12 @@ def game_menu_post():
 @login_required
 def game():
 	# Send a request to the random int API
-	url = "https://www.random.org/integers/?num=4&min=0&max=7&col=1&base=10&format=plain&rnd=new"
+	difficulty = UserPrefs.query.filter_by(user_email=current_user.email).first().difficulty
+	num_diff = num_digits_to_guess(difficulty)
+	max_attempts = num_allowed_attempts(difficulty)
+
+	print(num_diff)
+	url = "https://www.random.org/integers/?num="+num_diff+"&min=0&max=7&col=1&base=10&format=plain&rnd=new"
 	
 	# Receive the response and parse it into something usable
 	data = requests.get(url, timeout=2.50).text
@@ -62,7 +67,7 @@ def game():
 	user_email = current_user.email
 	status = "In Progress"
 	attempt = 0
-	new_game = CurrentGame(date=date, correct_answer=correct_answer, user_email = user_email, status=status, attempt=attempt)
+	new_game = CurrentGame(date=date, correct_answer=correct_answer, user_email = user_email, status=status, attempt=attempt, max_attempts=max_attempts)
 
 	# Add the CurrentGame to the DB
 	db.session.add(new_game)
@@ -74,7 +79,7 @@ def game():
 	print(current_game_id)
 	db.session.commit()
 
-	return render_template('game.html', name=current_user.name, status=new_game.status)
+	return render_template('game.html', name=current_user.name, status=new_game.status, difficulty=difficulty, max_attempts=max_attempts, attempt=new_game.attempt)
 
 @main.route('/game', methods=['POST'])
 def game_post():
@@ -82,6 +87,8 @@ def game_post():
     user_email = current_user.email
 
     current_game = CurrentGame.query.filter_by(id = current_user.current_game).first()
+
+    difficulty = UserPrefs.query.filter_by(user_email = current_user.email).first().difficulty
     
     #Increment number of attempts
     current_game.attempt += 1
@@ -124,12 +131,28 @@ def game_post():
     	current_game.status = "Won"
     	db.session.commit()
 
-    if guess != correct_answer and current_game.attempt == 10:
+    if guess != correct_answer and current_game.attempt == current_game.max_attempts:
     	flash('Aww, try again next time!')
     	current_game.status = "Lost"
     	db.session.commit()
 
-    return render_template('game.html', name=current_user.name, attempts=attempts, status=current_game.status)
+    return render_template('game.html', name=current_user.name, attempts=attempts, status=current_game.status, correct_answer=current_game.correct_answer, max_attempts= current_game.max_attempts, difficulty=difficulty, attempt=current_game.attempt)
 
     
     return redirect(url_for('main.game'))
+
+def num_digits_to_guess(level):
+	if level == "Hard":
+		return "5"
+	if level == "Medium":
+		return "4"
+	if level == "Easy":
+		return "3"
+	if level == "Zen":
+		return "5"
+
+def num_allowed_attempts(level):
+	if level == "Zen":
+		return 100
+	else:
+		return 10

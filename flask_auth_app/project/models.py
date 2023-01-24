@@ -20,6 +20,7 @@ class CurrentGame(db.Model):
 	user_email = db.Column(db.String(100))
 	status = db.Column(db.String(100))
 	attempt = db.Column(db.Integer)
+	max_attempts = db.Column(db.Integer)
 
 class GameAttempt(db.Model):
 	id = db.Column(db.Integer, primary_key=True)# primary keys are required by SQLAlchemy
