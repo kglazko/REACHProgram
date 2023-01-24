@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1 class="title">
+  Welcome, {{ name }}!
+</h1>
+
+<div class="columns">
+<div class="column is-one-half has-text-grey-dark">
+  <table id="modes" class="table is-bordered is-narrow is-hoverable is-fullwidth has-background-success-light">
+    <thead>
+      <tr>
+        <th>Mode</th>
+        <th>How long is the sequence to guess?</th>
+        <th>How many attempts?</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>Zen</td>
+          <td>5 numbers</td>
+          <td>100</td>
+        </tr>
+
+        <tr>
+          <td>Easy</td>
+          <td>3 numbers</td>
+          <td>10</td>
+        </tr>
+
+        <tr>
+          <td>Medium</td>
+          <td>4 numbers</td>
+          <td>10</td>
+        </tr>
+
+        <tr>
+          <td>Hard</td>
+          <td>5 numbers</td>
+          <td>10</td>
+        </tr>
+    </tbody>
+  </table>
+</div>
+<div class="column is-one-half">
+<form form method="POST" action="/game_menu">
+  <div class="field">
+                <div class="control">
+            <h2 id="scores">
+  Select a Mode
+</h2>
+            <div class="select is-primary">
+              <select name="difficulty">
+              <option>Zen</option>
+              <option>Easy</option>
+              <option>Medium</option>
+              <option>Hard</option>
+              </select>
+            </div>
+
+            <button class="button is-success">Start Game</button>
+          </div>
+        </div>
+        </form>
+      </div>
+</div>
+
+{% endblock %}
