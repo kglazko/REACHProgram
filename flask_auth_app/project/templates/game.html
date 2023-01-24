@@ -8,11 +8,14 @@
 	{% with messages = get_flashed_messages() %}
         {% if messages %}
     <div class="notification is-success">
-        {{ messages[0] }} See your scores on your <a href="{{ url_for('main.profile') }}">profile</a>.
+        {{ messages[0] }} See your scores on your <a href="{{ url_for('main.profile') }}">profile.</a> Or <a href="{{ url_for('main.game') }}">play again.</a>
     </div>
         {% endif %}
         {% endwith %}
 	</div>
+
+<div class="columns">
+<div class="column is-one-half">
 <h1 id="scores">
 	Number of Guesses Remaining: 10
 </h1>
@@ -30,14 +33,28 @@
             <button class="button is-block is-info is-large is-fullwidth" disabled>Game Over</button>
             {% endif %}
         </form>
- 
- <div id="feedback">
- 	<p>Attempts: {{ attempt }}</p> 
  </div>
- <ul>
-        {% for n in attempts %}
-        <li>Attempt {{n.attempt}}: Guess: {{n.guess}} Feedback:{{n.feedback}}</li>
-        {% endfor %}
-</ul>
+ 
+ <div id="feedback" class="column is-one-half">
+ 	<table id="data" class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
+    <thead>
+      <tr>
+        <th>Attempt</th>
+        <th>Guess</th>
+        <th>Feedback</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for n in attempts %}
+        <tr>
+          <td>{{ n.attempt }}</td>
+          <td>{{ n.guess }}</td>
+          <td>{{ n.feedback }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+ </div>
+</div>
 
 {% endblock %}

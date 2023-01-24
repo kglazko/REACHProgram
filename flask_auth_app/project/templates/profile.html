@@ -7,4 +7,24 @@
 <h1 id="scores">
 	My Scores
 </h1>
+ 	<table id="data" class="table is-bordered is-striped is-narrow is-hoverable">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Correct Answer</th>
+        <th>Attempts</th>
+        <th>Outcome</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for n in game_records %}
+        <tr>
+          <td>{{ n.date }}</td>
+          <td>{{ n.correct_answer }}</td>
+          <td>{{ n.attempt }}</td>
+          <td>{{ n.status }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
 {% endblock %}

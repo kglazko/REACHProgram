@@ -1,8 +1,9 @@
 import requests
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required, current_user
-from .models import CurrentGame, GameAttempt
+from .models import CurrentGame, GameAttempt, UserPrefs
 from . import db
+from datetime import datetime
 
 main = Blueprint('main', __name__)
 
@@ -13,7 +14,33 @@ def index():
 @main.route('/profile')
 @login_required
 def profile():
-    return render_template('profile.html', name=current_user.name)
+	game_records = CurrentGame.query.filter_by(user_email= current_user.email)
+	return render_template('profile.html', name=current_user.name, game_records=game_records)
+
+@main.route('/game_menu')
+@login_required
+def game_menu():
+	game_records = CurrentGame.query.filter_by(user_email= current_user.email)
+	return render_template('game_menu.html', name=current_user.name)
+
+@main.route('/game_menu', methods=['POST'])
+def game_menu_post():
+	difficulty = request.form.get('difficulty')
+	print(difficulty)
+
+	user_email = current_user.email
+
+	user = UserPrefs.query.filter_by(user_email=user_email).first() # if this returns a user, then the email already exists in database
+	if user:
+		user.difficulty = difficulty
+		db.session.commit()
+	else:
+		user = UserPrefs(user_email=user_email, difficulty=difficulty)
+		db.session.add(user)
+		db.session.commit()
+
+	return redirect(url_for('main.game'))
+
 
 @main.route('/game')
 @login_required
@@ -25,12 +52,17 @@ def game():
 	data = requests.get(url, timeout=2.50).text
 	print(str(data).replace("\n", ""))
 
+	# Get the date
+	now = datetime.now()
+	parsed_date = now.strftime("%m/%d/%Y")
+
 	# Define the needed attributes of the CurrentGame
+	date = parsed_date
 	correct_answer = str(data).replace("\n", "")
 	user_email = current_user.email
 	status = "In Progress"
 	attempt = 0
-	new_game = CurrentGame(correct_answer=correct_answer, user_email = user_email, status=status, attempt=attempt)
+	new_game = CurrentGame(date=date, correct_answer=correct_answer, user_email = user_email, status=status, attempt=attempt)
 
 	# Add the CurrentGame to the DB
 	db.session.add(new_game)
@@ -90,6 +122,11 @@ def game_post():
     if guess == correct_answer:
     	flash('Game Success! You win!')
     	current_game.status = "Won"
+    	db.session.commit()
+
+    if guess != correct_answer and current_game.attempt == 10:
+    	flash('Aww, try again next time!')
+    	current_game.status = "Lost"
     	db.session.commit()
 
     return render_template('game.html', name=current_user.name, attempts=attempts, status=current_game.status)
