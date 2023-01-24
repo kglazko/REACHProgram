@@ -84,3 +84,38 @@ class GameAttempt(db.Model):
 	feedback = db.Column(db.String(100))
 ```
 * `UserPrefs` currently tracks the game difficulty a user has selected when starting the game. `CurrentGame`, named a bit poorly perhaps, represents a game that is or was played by a player. It tracks important game features like the correct answer, the number of guesses a user has made, and the max number of attempts (10 except in Zen Mode).`GameAttempt` tracks the guesses themselves a user has made for a specific game, as well as feedback strings that accompany those guesses. The primary purpose of this table was just to display the attempts and feedback to the user in a way that persists despite the template re-rendering with each guess.
+* Flask has a nice `current_user` feature that makes it very easy to identify the user, so most of the tables hinge on the current user and the `current_game` that is updated as they start a new game. The game ID represented by `current_game` is important to all the updates happening due to the game logic.
+
+### Game Logic
+* The random number generation occurs in `main.py`, namely: 
+```
+url = "https://www.random.org/integers/?num="+num_diff+"&min=0&max=7&col=1&base=10&format=plain&rnd=new"
+data = requests.get(url, timeout=2.50).text
+correct_answer = str(data).replace("\n", "")
+```
+* `num_diff` is determined by the difficult level, and a simple if-based function determines that.
+* The user then types guesses into the form seen in the `game.html` template. Every time they submit a guess, the response is checked against the correct answer. Attempt numbers are incremented, and when a user reaches the attempt limit, the game will end and they will be prompted to try again or see their results on their profile through a `flash`. Likewise, if the user succeeds, they will be congratulated and offered the same options (once again, this takes place in `main.py`.
+* The game logic to determine whether a number or position is correct is the following:
+```
+def calculate_correct_numbers(guess, answer):
+	num = 0
+	guess_set = set(guess)
+
+	for i in guess_set:
+		guess_instances = guess.count(i)
+		answer_instances = answer.count(i)
+		if answer_instances > 0:
+			if guess_instances > answer_instances:
+				num += answer_instances
+
+			else:
+				num += guess_instances
+	return num
+
+def calculate_correct_position(guess,answer):
+	pos = 0
+	for i in range (0, len(guess)):
+		if guess[i] == answer[i]:
+			pos +=1
+	return pos
+```
