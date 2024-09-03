@@ -10,7 +10,6 @@ import sys
 import time
 import traceback
 from datetime import datetime
-from random import randint
 from ssl import SSLError
 
 from gunicorn import util
@@ -24,6 +23,7 @@ from gunicorn.http.errors import (
 from gunicorn.http.wsgi import Response, default_environ
 from gunicorn.reloader import reloader_engines
 from gunicorn.workers.workertmp import WorkerTmp
+import secrets
 
 
 class Worker(object):
@@ -54,7 +54,7 @@ class Worker(object):
         self.nr = 0
 
         if cfg.max_requests > 0:
-            jitter = randint(0, cfg.max_requests_jitter)
+            jitter = secrets.SystemRandom().randint(0, cfg.max_requests_jitter)
             self.max_requests = cfg.max_requests + jitter
         else:
             self.max_requests = sys.maxsize
