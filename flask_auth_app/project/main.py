@@ -1,9 +1,9 @@
-import requests
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required, current_user
 from .models import CurrentGame, GameAttempt, UserPrefs
 from . import db
 from datetime import datetime
+from security import safe_requests
 
 main = Blueprint('main', __name__)
 
@@ -54,7 +54,7 @@ def game():
 	url = "https://www.random.org/integers/?num="+num_diff+"&min=0&max=7&col=1&base=10&format=plain&rnd=new"
 	
 	# Receive the response and parse it into something usable
-	data = requests.get(url, timeout=2.50).text
+	data = safe_requests.get(url, timeout=2.50).text
 	print(str(data).replace("\n", ""))
 
 	# Get the date
